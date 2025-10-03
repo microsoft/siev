@@ -1,0 +1,14 @@
+{
+    "info": {
+        "filename": "sample_exam",
+        "id": "0",
+        "size": 1,
+        "output_dir": "data/input/mmlu_dataset/",
+        "data_dir": "misc",
+        "seed": 0
+    },
+    "0": {
+        "question": "Which is a major characteristic of the bunyavirus family?: A) Amplify by persistent infection of midgets, mosquitoes, sand flies, ticks, B) Predominantly mosquito borne, C) Genetic recombination or reassortment, D) Spread to humans via bites of mice and rats",
+        "answer": "A"
+    }
+}

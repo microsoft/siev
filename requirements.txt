@@ -1,0 +1,25 @@
+# Core dependencies for SIEV: Structured dIalectical rEasoning eValuation
+azure-storage-blob
+azure-storage-file-share
+azure-storage-file-datalake
+azure-storage-queue
+azure-identity
+datasets
+Flask
+matplotlib
+numpy
+ollama
+openai
+pandas
+plotly
+python-dotenv
+Requests
+scikit_learn
+scipy
+seaborn
+setuptools
+termcolor
+torch
+tqdm
+transformers
+psutil

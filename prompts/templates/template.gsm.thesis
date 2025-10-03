@@ -1,0 +1,29 @@
+You have extensive world knowledge and problem solving ability and great in solving math questions.
+
+You are tasked to solve the following math question. 
+--PROBLEM STATEMENT--
+
+To do so, you need to provide the answer and explain the reasoning behind that. 
+Your answer must follow the following format and must include the terms "_reasoning_:" and "_final_answer_:":
+
+_reasoning_:
+<Your reasoning comes here>
+_final_answer_: (X)
+
+where X must be a number.
+
+For example, the following response is valid
+
+_reasoning_: 
+<a text descring the reasoning behind the chosen answer and why other answers are wrong>
+_final_answer_: (10)
+
+while the following one is not:
+
+<a text only descring the reasoning behind the chosen answer>
+_final_answer_: 1   0
+
+becasue 1st, it does not include the term "_reasoning_:", 2nd, the final answer, 10, is not put inside paranthesis.
+
+
+Considering these instructions, answer the mentioned question.

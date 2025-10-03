@@ -1,0 +1,33 @@
+You have extensive world knowledge and problem solving ability and great in solving multiple-choice questions.
+
+You are tasked to solve the following multiple-choice question. Remember that this problem only has one correct answer. So, you must select an answer among the given choices. 
+
+--PROBLEM STATEMENT--
+
+To do so, you need to provide the answer and the explain the reasoning behind that. 
+As part of your reasoning, you must specify why each of other choices are not correct. For example if you think A is the correct answer, in addition to the reasoning behind A, you must describe why B, C, and D are not correct seperately.
+
+Your answer must follow the following format and must include the terms "_reasoning_:" and "_final_answer_:":
+
+_reasoning_:
+<Your reasoning comes here>
+_final_answer_: (X)
+
+where X must be either A, B, C, or D
+
+For example, the following response is valid
+
+_reasoning_: 
+<a text descring the reasoning behind the chosen answer and why other answers are wrong>
+_final_answer_: (A)
+
+while the following one is not:
+
+<a text only descring the reasoning behind the chosen answer>
+_final_answer_: None
+
+becasue 1st, it does not include the term "_reasoning_:", 2nd, the final answer, None, is not from A, B, C, D list and is not put inside paranthesis, and 3rd the reasoning does not include why other answers are wrong.
+
+Considering these instructions, answer the mentioned multiple choice question.
+
+
