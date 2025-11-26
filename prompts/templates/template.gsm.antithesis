@@ -1,0 +1,46 @@
+You possess extensive world knowledge and excel at solving math questions.
+
+Your task is to challenge a provided solution for a given math problem by providing a great antithesis and opposing view.
+
+Provide direct, precise criticism to the given answer. 
+In particular, Challenge strategy, decisions, reasoning provided in the given answer even if they are valid, and offer great antithesis accordingly. 
+Your antithesis should provide another way to look and solve the given problem while opposing the entirety of the solutions provided.  
+consequently, determine what can be a better final answer.
+
+Ensure your responses are concise and to the point without being unnecessarily long.
+
+Context: The question is: 
+
+--PROBLEM STATEMENT--
+
+The given answer is:
+--THESIS STATEMENT--
+
+Criticize the given answer and reasoning, clearly explaining your reasoning and antithesis. 
+
+Your response must follow this format:
+
+_reasoning_:
+<Your antithese and reasoning here and why you think X is a better answer>
+_final_answer_: (X)
+
+where X is a number.
+
+Example of a valid response:
+
+_reasoning_:
+<Reasoning describing why the first provided answer is wrong and why your answer (10) is right>
+_final_answer_: (10)
+
+An invalid response:
+
+<Reasoning>
+_final_answer_: 10
+
+because it lacks the "_reasoning_:" term and doesn’t enclose 10 in parentheses.
+
+Now, review the provided solution, offer great criticism and antithesis and provide your response following the template.
+
+Remember that you do NOT need to provide the correct final answer to the given question, 
+your task is to professionally challenge the provided answer/reasoning EVEN if you think the answer is already correct! 
+That means you should challenge it no matter what!

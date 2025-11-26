@@ -1,0 +1,102 @@
+THIRD PARTY SOFTWARE NOTICES AND INFORMATION
+
+This project incorporates components from the projects listed below. Microsoft licenses these components under the Microsoft software license terms. The original copyright notices and the licenses under which Microsoft received such components are set forth below for informational purposes only. Microsoft reserves all rights not expressly granted herein, whether by implication, estoppel or otherwise.
+
+================================================================================
+
+1. Azure SDK for Python
+   Copyright (c) Microsoft Corporation
+   Licensed under the MIT License
+   https://github.com/Azure/azure-sdk-for-python
+
+2. OpenAI Python Library
+   Copyright (c) OpenAI
+   Licensed under the Apache License 2.0
+   https://github.com/openai/openai-python
+
+3. Requests HTTP Library
+   Copyright (c) Kenneth Reitz
+   Licensed under the Apache License 2.0
+   https://github.com/psf/requests
+
+4. NumPy
+   Copyright (c) NumPy Developers
+   Licensed under the BSD 3-Clause License
+   https://github.com/numpy/numpy
+
+5. Pandas
+   Copyright (c) pandas-dev team
+   Licensed under the BSD 3-Clause License
+   https://github.com/pandas-dev/pandas
+
+6. Matplotlib
+   Copyright (c) Matplotlib Development Team
+   Licensed under the Matplotlib License (based on PSF)
+   https://github.com/matplotlib/matplotlib
+
+7. scikit-learn
+   Copyright (c) scikit-learn developers
+   Licensed under the BSD 3-Clause License
+   https://github.com/scikit-learn/scikit-learn
+
+8. SciPy
+   Copyright (c) SciPy developers
+   Licensed under the BSD 3-Clause License
+   https://github.com/scipy/scipy
+
+9. Seaborn
+   Copyright (c) Michael Waskom and the seaborn development team
+   Licensed under the BSD 3-Clause License
+   https://github.com/mwaskom/seaborn
+
+10. Plotly Python
+    Copyright (c) Plotly, Inc.
+    Licensed under the MIT License
+    https://github.com/plotly/plotly.py
+
+11. PyTorch
+    Copyright (c) Facebook, Inc. and its affiliates
+    Licensed under the BSD 3-Clause License
+    https://github.com/pytorch/pytorch
+
+12. Transformers
+    Copyright (c) Hugging Face, Inc.
+    Licensed under the Apache License 2.0
+    https://github.com/huggingface/transformers
+
+13. Datasets
+    Copyright (c) Hugging Face, Inc.
+    Licensed under the Apache License 2.0
+    https://github.com/huggingface/datasets
+
+14. tqdm
+    Copyright (c) tqdm developers
+    Licensed under the MPL-2.0 and MIT Licenses
+    https://github.com/tqdm/tqdm
+
+15. Flask
+    Copyright (c) Pallets
+    Licensed under the BSD 3-Clause License
+    https://github.com/pallets/flask
+
+16. python-dotenv
+    Copyright (c) Saurabh Kumar
+    Licensed under the BSD 3-Clause License
+    https://github.com/theskumar/python-dotenv
+
+17. termcolor
+    Copyright (c) Konstantin Lepa
+    Licensed under the MIT License
+    https://github.com/termcolor/termcolor
+
+18. psutil
+    Copyright (c) Giampaolo Rodola
+    Licensed under the BSD 3-Clause License
+    https://github.com/giampaolo/psutil
+
+19. Ollama Python
+    Copyright (c) Ollama
+    Licensed under the MIT License
+    https://github.com/ollama/ollama-python
+
+All third-party software components are used in accordance with their respective licenses. The complete license texts for these components can be found in their respective repositories or through package managers.
