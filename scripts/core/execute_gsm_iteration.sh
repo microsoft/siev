@@ -44,10 +44,15 @@ thesis_name=$(basename "$thesis")
 antithesis="${TEMPLATES_DIR}/template.gsm.antithesis"
 antithesis_name=$(basename "$antithesis")
 
+natural_antithesis="${TEMPLATES_DIR}/template.gsm.antithesis.natural"
+natural_antithesis_name=$(basename "$natural_antithesis")
+
 synthesis="${TEMPLATES_DIR}/template.gsm.synthesis"
 
 synthesis_name=$(basename "$synthesis")
 new_dir="${dir}"
+
+max_natural_samples=${MAX_NATURAL_SAMPLES:-3}
 
 copy_files_to_new_dir() {
     local new_dir="$1"
@@ -55,6 +60,7 @@ copy_files_to_new_dir() {
     cp "$exam" "$new_dir"/
     cp "$thesis" "$new_dir"/
     cp "$antithesis" "$new_dir"/
+    cp "$natural_antithesis" "$new_dir"/
     cp "$synthesis" "$new_dir"/
     cp "$env_file" "$new_dir"/.env
     cp ${TEMPLATES_DIR}/question.gsm "$new_dir"/
@@ -67,6 +73,7 @@ copy_files_to_new_dir() {
             --output_dir="$new_dir_attempt" --exam="$exam" --try_index=$i \
             --env=".env" \
             --antithesis_base_prompt="$antithesis_name" \
+            --natural_antithesis_base_prompt="$natural_antithesis_name" \
             --thesis_base_prompt="$thesis_name" \
             --synthesis_base_prompt="$synthesis_name" \
             --num_rounds=$num_rounds \
@@ -76,5 +83,6 @@ copy_files_to_new_dir() {
             --test_type="gsm" \
             --multi-model=$multimodel \
             --model2="$model2" \
-            --redacted=$redacted
+            --redacted=$redacted \
+            --max_natural_samples=$max_natural_samples
     python3 ${ANALYSIS_SCRIPTS_DIR}/evaluate_reasoning.py --dir="$new_dir_attempt" --try_index=$i --num_rounds=$num_rounds

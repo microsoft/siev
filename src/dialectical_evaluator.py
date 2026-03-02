@@ -249,6 +249,11 @@ class DialecticalEvaluator:
         parser.add_argument('--num_rounds', type=int, default=2, help="number of rounds of synthesis to run for each question")
 
         parser.add_argument('--test_type', type=str, default="mmlu", help="test type: gsm, mmlu")
+
+        parser.add_argument('--natural_antithesis_base_prompt', type=str, default="template.natural.antithesis.gen",
+                            help="natural antithesis base prompt (used when a naturally different thesis is found)")
+        parser.add_argument('--max_natural_samples', type=int, default=3,
+                            help="max additional thesis samples to find a naturally different answer (0 to disable natural antithesis)")
         
         parser.add_argument('--redacted', type=int, choices=[0, 1], default=0, help="redacted or not (r1 <think>..</think> part)? For backward compatibility, the default is 0")
         
@@ -299,6 +304,40 @@ class DialecticalEvaluator:
 
         self.debug_print(antithesis_prompt)
         return antithesis_prompt
+
+    def natural_antithesis_prompt_preparation(self, args, question, thesis, natural_alt_thesis):
+        """
+        Prepare a natural antithesis prompt grounded in a naturally sampled alternative thesis.
+
+        Rather than forcing opposition for its own sake, this prompt shows the antithesis
+        agent an alternative solution that independently arrived at a different answer,
+        and asks it to use that as the basis for its critique.
+
+        Args:
+            args: Command line arguments
+            question (str): The original question
+            thesis (str): The original thesis response
+            natural_alt_thesis (str): The naturally sampled alternative thesis with a different answer
+
+        Returns:
+            str: Formatted natural antithesis prompt
+        """
+        natural_antithesis_prompt_path = os.path.join(args.output_dir, args.natural_antithesis_base_prompt)
+        with open(natural_antithesis_prompt_path, 'r') as file:
+            natural_antithesis_prompt = file.read()
+        natural_antithesis_prompt = natural_antithesis_prompt.replace("--PROBLEM STATEMENT--", "\n" + question)
+
+        if args.redacted == 1:
+            thesis_redacted = re.sub(r'<think>(.*?)</think>', '', thesis, flags=re.DOTALL)
+            natural_antithesis_prompt = natural_antithesis_prompt.replace("--THESIS STATEMENT--", "\n" + thesis_redacted)
+            natural_alt_redacted = re.sub(r'<think>(.*?)</think>', '', natural_alt_thesis, flags=re.DOTALL)
+            natural_antithesis_prompt = natural_antithesis_prompt.replace("--NATURAL THESIS STATEMENT--", "\n" + natural_alt_redacted)
+        else:
+            natural_antithesis_prompt = natural_antithesis_prompt.replace("--THESIS STATEMENT--", "\n" + thesis)
+            natural_antithesis_prompt = natural_antithesis_prompt.replace("--NATURAL THESIS STATEMENT--", "\n" + natural_alt_thesis)
+
+        self.debug_print(natural_antithesis_prompt)
+        return natural_antithesis_prompt
 
     def synthesis_prompt_preparation_v2(self, args, question, thesis, antithesis):
         # with open(args.synthesis_base_prompt, 'r') as file:
@@ -741,21 +780,21 @@ class DialecticalEvaluator:
             self.progress.complete_evaluation()
 
     def hegel(self, question, answer, current_try_inx, idx, args):
-        
-        # Prepare thesis prompt            
+
+        # Prepare thesis prompt
         self.thesis_obj = Thesis()
         self.iteration = str(current_try_inx) + '_' + str(idx)
         self.iteration = "thesis_" + self.iteration
         self.set_assistant(args)
         thesis_prompt = self.thesis_prompt_preparation(args, question)
         thesis_response = self.assistant.run_with_given_question(thesis_prompt)
-        self.log_assist(f"Thesis Prompt: {thesis_prompt}\n", f"Thesis Response: {thesis_response}\n")           
+        self.log_assist(f"Thesis Prompt: {thesis_prompt}\n", f"Thesis Response: {thesis_response}\n")
         self.thesis_obj = self.parse_function(thesis_response)
         response, self.thesis_obj = self.handling_error(self.thesis_obj)
         if response == "context_length_exceeded":
             self.log_assist(f"context_length_exceeded", f"\n")
             return response
-            
+
         self.log_assist(f"\n", f"\n")
         self.debug_print("="*20)
         response_data = {
@@ -765,8 +804,34 @@ class DialecticalEvaluator:
             "thesis_answer": self.thesis_obj.final_answer
         }
 
+        # --- Natural antithesis sampling ---
+        # Sample additional theses until we find one with a different final answer,
+        # up to max_natural_samples attempts. If found, use it to ground the antithesis
+        # rather than opposing for the sake of opposition.
+        natural_alt_obj = None
+        max_natural_samples = getattr(args, 'max_natural_samples', 3)
+        if max_natural_samples > 0 and self.thesis_obj.final_answer not in (None, "None"):
+            for nat_sample_idx in range(max_natural_samples):
+                self.iteration = str(current_try_inx) + '_' + str(idx) + '_nat' + str(nat_sample_idx)
+                self.iteration = "thesis_nat_" + self.iteration
+                self.set_assistant(args)
+                nat_thesis_prompt = self.thesis_prompt_preparation(args, question)
+                nat_thesis_response = self.assistant.run_with_given_question(nat_thesis_prompt)
+                self.log_assist(f"Natural Sample {nat_sample_idx} Prompt: {nat_thesis_prompt}\n",
+                                f"Natural Sample {nat_sample_idx} Response: {nat_thesis_response}\n")
+                nat_obj = self.parse_function(nat_thesis_response)
+                _, nat_obj = self.handling_error(nat_obj)
+                if nat_obj.final_answer not in (None, "None") and nat_obj.final_answer != self.thesis_obj.final_answer:
+                    natural_alt_obj = nat_obj
+                    self.log_assist(f"Natural alternative found on sample {nat_sample_idx}: "
+                                    f"thesis={self.thesis_obj.final_answer}, alt={nat_obj.final_answer}\n", "")
+                    break
+
+        response_data["natural_alt_thesis"] = natural_alt_obj.thesis if natural_alt_obj else None
+        response_data["natural_alt_answer"] = natural_alt_obj.final_answer if natural_alt_obj else None
+
         for synth_round in range(self.num_rounds):
-            
+
             # Loop for multiple antithesis
             combined_antitheses = ""
             combined_antitheses_final_answers = ""
@@ -774,7 +839,7 @@ class DialecticalEvaluator:
 
             for antithesis_try in range(self.num_antithesis):
                 self.antithesis_obj = Thesis()
-                self.iteration = str(synth_round) + '_' + str(current_try_inx) + '_' + str(idx) 
+                self.iteration = str(synth_round) + '_' + str(current_try_inx) + '_' + str(idx)
                 self.iteration = f"antithesis_{antithesis_try}_" + self.iteration
                 if args.multi_model == 0:
                     self.set_assistant(args)
@@ -783,7 +848,11 @@ class DialecticalEvaluator:
                     self.set_assistant_2(args)
                     current_assistant = self.assistant2
 
-                antithesis_prompt = self.antithesis_prompt_preparation(args, question, self.thesis_obj.thesis)
+                if natural_alt_obj is not None:
+                    antithesis_prompt = self.natural_antithesis_prompt_preparation(
+                        args, question, self.thesis_obj.thesis, natural_alt_obj.thesis)
+                else:
+                    antithesis_prompt = self.antithesis_prompt_preparation(args, question, self.thesis_obj.thesis)
                 antithesis_response = current_assistant.run_with_given_question(antithesis_prompt)
                 self.log_assist(f"Antithesis Prompt: {antithesis_prompt}\n", f"Antithesis Response: {antithesis_response}\n")
                 self.antithesis_obj = self.parse_function(antithesis_response)

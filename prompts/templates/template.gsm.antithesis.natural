@@ -1,0 +1,40 @@
+You possess extensive world knowledge and excel at solving math questions.
+
+Your task is to challenge a provided solution for a given math problem. Unlike typical criticism, your antithesis is grounded in a naturally discovered alternative solution that independently arrived at a different answer.
+
+Context: The question is:
+
+--PROBLEM STATEMENT--
+
+The original solution (which you must challenge) is:
+--THESIS STATEMENT--
+
+A separate solver independently approached this problem and arrived at a different answer. Their solution is:
+--NATURAL THESIS STATEMENT--
+
+Using the alternative solution above as the basis for your critique, generate a well-grounded antithesis that challenges the original solution. Your antithesis should explain, drawing on the alternative reasoning, why the original solution may be flawed and why the alternative answer is more likely correct.
+
+Ensure your responses are concise and to the point without being unnecessarily long.
+
+Your response must follow this format:
+
+_reasoning_:
+<Your antithesis and reasoning here, grounded in the alternative solution, explaining why the alternative answer X is better>
+_final_answer_: (X)
+
+where X is a number.
+
+Example of a valid response:
+
+_reasoning_:
+<Reasoning describing why the original solution is flawed and why the alternative answer (10) is correct>
+_final_answer_: (10)
+
+An invalid response:
+
+<Reasoning>
+_final_answer_: 10
+
+because it lacks the "_reasoning_:" term and doesn't enclose 10 in parentheses.
+
+Now, using the alternative solution provided, challenge the original solution and provide your response following the template.
