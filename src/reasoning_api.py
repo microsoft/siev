@@ -425,12 +425,38 @@ class ReasoningAPI:
         with open(self.role_file_path, 'r') as file:
             role = file.read()
 
-        # Use AzureOpenAI for Azure endpoints
-        self.client = AzureOpenAI(
-            api_key=openai_key,
-            api_version="2024-09-01-preview",
-            azure_endpoint=gcr_url
-        )
+        # # Use AzureOpenAI for Azure endpoints
+        # self.client = AzureOpenAI(
+        #     api_key=openai_key,
+        #     api_version="2024-09-01-preview",
+        #     azure_endpoint=gcr_url
+        # )
+
+        # Choose OpenAI vs AzureOpenAI based on endpoint
+        endpoint = (gcr_url or "").strip()
+
+        is_openai = "api.openai.com" in endpoint
+        is_azure = ("openai.azure.com" in endpoint) or ("azure.com" in endpoint)
+
+        if is_openai:
+            # OpenAI (and OpenAI-compatible servers via base_url)
+            self.client = OpenAI(
+                api_key=openai_key,
+                base_url=endpoint  # e.g., https://api.openai.com/v1
+            )
+        elif is_azure:
+            # Azure OpenAI
+            self.client = AzureOpenAI(
+                api_key=openai_key,
+                api_version=os.getenv("REASONING_API_VERSION", "2024-09-01-preview"),
+                azure_endpoint=endpoint
+            )
+        else:
+            # Fallback: treat as OpenAI-compatible base_url (vLLM/TGI/etc.)
+            self.client = OpenAI(
+                api_key=openai_key,
+                base_url=endpoint
+            )
         
         return {
             'key': openai_key,

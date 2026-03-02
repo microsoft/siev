@@ -796,10 +796,10 @@ class DialecticalEvaluator:
                 self.debug_print("-"*10)
             
             self.debug_print("="*20)
-            response_data = response_data | {
+            response_data.update({
                 f"antitheses_{synth_round}": combined_antitheses,
                 f"antitheses_answers_{synth_round}": combined_antitheses_final_answers
-            }
+            })
 
             # Prepare synthesis prompt with all antitheses
             self.synthesis_obj = Thesis()
@@ -815,10 +815,10 @@ class DialecticalEvaluator:
                 return response
             self.log_assist(f"\n", f" ")
             self.debug_print("="*20)
-            response_data = response_data | {
+            response_data.update({
                 f"synthesis_{synth_round}": self.synthesis_obj.thesis,
                 f"synthesis_answer_{synth_round}": self.synthesis_obj.final_answer
-            }
+            })
 
             # Now, we feed in the synthesis response as a thesis and repeat the process
             self.thesis_obj = self.synthesis_obj
