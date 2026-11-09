@@ -58,6 +58,24 @@ debug_flag = False
 # Prevents infinite retry loops on persistent API failures
 max_num_consq_errors = 5
 
+
+def strip_thinking(text):
+    """Remove a model's thinking before its text is passed to another stage (--redacted 1).
+
+    Keeps what follows the last </think>. Some reasoning models (e.g. DeepSeek-R1) emit no opening
+    <think> tag, so a pattern that needs both tags removes nothing; an unclosed <think> (output cut
+    at the token limit) is all thinking and is dropped.
+    """
+    if text is None:
+        return text
+    text = str(text)
+    if "</think>" in text:
+        return text.rsplit("</think>", 1)[1]
+    if "<think>" in text:
+        return text.split("<think>", 1)[0]
+    return text
+
+
 class Thesis:
     """
     Container class for dialectical reasoning responses (thesis/antithesis/synthesis).
@@ -250,7 +268,7 @@ class DialecticalEvaluator:
 
         parser.add_argument('--test_type', type=str, default="mmlu", help="test type: gsm, mmlu")
         
-        parser.add_argument('--redacted', type=int, choices=[0, 1], default=0, help="redacted or not (r1 <think>..</think> part)? For backward compatibility, the default is 0")
+        parser.add_argument('--redacted', type=int, choices=[0, 1], default=0, help="remove each model's thinking (<think>..</think>, or everything up to </think> when the opening tag is missing) before its text is passed to another stage? For backward compatibility, the default is 0")
         
         args = parser.parse_args()
         return args
@@ -291,8 +309,8 @@ class DialecticalEvaluator:
         antithesis_prompt = antithesis_prompt.replace("--PROBLEM STATEMENT--", "\n" + question)
 
         if args.redacted == 1:
-            # Remove reasoning chains for R1 models if redacted mode enabled
-            thesis_redacted = re.sub(r'<think>(.*?)</think>', '', thesis, flags=re.DOTALL)
+            # Remove the thesis model's thinking before the antithesis sees it
+            thesis_redacted = strip_thinking(thesis)
             antithesis_prompt = antithesis_prompt.replace("--THESIS STATEMENT--", "\n" + thesis_redacted)    
         else:
             antithesis_prompt = antithesis_prompt.replace("--THESIS STATEMENT--", "\n" + thesis)
@@ -304,12 +322,8 @@ class DialecticalEvaluator:
         # with open(args.synthesis_base_prompt, 'r') as file:
         #     synthesis_prompt = file.read()
         synthesis_prompt = f"To help you on your task, I provide you with the responses of {self.num_antithesis} other agent(s) who are observing your answers:"
-        if args.redacted == 1:
-            antithesis_redacted = re.sub(r'<think>(.*?)</think>', '', antithesis, flags=re.DOTALL)
-            synthesis_prompt = synthesis_prompt + "\n\nThesis: " + antithesis_redacted
-            synthesis_prompt = synthesis_prompt + antithesis
-        else:
-            synthesis_prompt = synthesis_prompt + antithesis
+        # With --redacted 1, each antithesis's thinking is already removed in hegel(), before the join.
+        synthesis_prompt = synthesis_prompt + antithesis
 
         synthesis_prompt = synthesis_prompt + "\n\nNow, Given the arguments and comments provided, update your answer. \
                 btw, keep the same format as before when you are responding.\n\n"
@@ -791,7 +805,10 @@ class DialecticalEvaluator:
                 if response == "context_length_exceeded":
                     return response
                 self.log_assist(f"\n", f" ")
-                combined_antitheses = combined_antitheses + "\n\nReviewer " + str(antithesis_try+1) + ":\n" + str(self.antithesis_obj.thesis)
+                critic_text = str(self.antithesis_obj.thesis)
+                if args.redacted == 1:
+                    critic_text = strip_thinking(critic_text)
+                combined_antitheses = combined_antitheses + "\n\nReviewer " + str(antithesis_try+1) + ":\n" + critic_text
                 combined_antitheses_final_answers = combined_antitheses_final_answers + ", " + str(self.antithesis_obj.final_answer)
                 self.debug_print("-"*10)
             
