@@ -69,7 +69,7 @@ model2="$1"      # Secondary model (same as primary for single-model eval)
 
 # Dialectical evaluation parameters
 attempts="$4"        # Number of evaluation attempts (required argument)
-redact=1             # Whether to redact model responses in logs (1=yes, 0=no)
+redact=1             # Remove each model's thinking before its text goes to the next stage (1=yes, 0=no)
 
 # Output configuration
 test_name="$2"                              # Experiment name from user input

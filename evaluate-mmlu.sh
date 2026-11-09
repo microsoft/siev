@@ -61,7 +61,7 @@ model2="$1"
 exams="$5"        # Exam path (required argument)
 
 attempts="$4"     # Number of evaluation attempts (required argument)
-redact=1
+redact=1          # Remove each model's thinking before its text goes to the next stage (1=yes, 0=no)
 test_name="$2"
 output_dir="data/experiments/${test_name}"
 env="$3"          # Environment file (required argument)
